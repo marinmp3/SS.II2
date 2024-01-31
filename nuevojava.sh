@@ -13,10 +13,10 @@ public class App{
 
 # PARA INTRODUCIRLO POR ARGUMENTO
 #!/bin/bash
-mkdir nuevojava
-mkdir nuevojava/bin
-mkdir nuevojava/src
-mkdir nuevojava/lib
+mkdir $1
+mkdir $1/bin
+mkdir $1/src
+mkdir $1/lib
 printf "
 public class App{
 	public static void main(String[] args){
