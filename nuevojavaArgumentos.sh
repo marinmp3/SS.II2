@@ -1,15 +1,14 @@
 #!/bin/bash
 # Crea un script que genere la estructura de directorios de java
-# y un App.java con "Hola mundo"
+# introduciendo por teclado el nombre del proyecto y un App.java con "Hola mundo"
 
-mkdir nuevojava
-mkdir nuevojava/bin
-mkdir nuevojava/src
-mkdir nuevojava/lib
-touch nuevojava/src/App.java
+mkdir $1
+mkdir $1/bin
+mkdir $1/src
+mkdir $1/lib
 printf "
 public class App{
 	public static void main(String[] args){
 		System.out.println(\"Hola mundo!\");
 	}
-}">>nuevojava/src/App.java
+}">>$1/src/App.java
