@@ -23,3 +23,4 @@ sudo usermod -s /bin/bash {username} (p.e. cambia la shell al user esp.)
 * -su: accede a un usuario
 * sudo passwd User: crea una contraseña para el user especificado
 * sudo usermod -aG personal {username}: asigna el grupo personal al user
+* sudo + cualquier otro comando de escritura (mkdir, touch...) para realizar la acción desde otro usuario
