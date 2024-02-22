@@ -6,8 +6,8 @@ for arg in $@
 do
     fichero="./gestionemos.log"
     touch $fichero
-    printf "%-F %-T %-s %-10s %-10s %-10s %-10s %-10s %-10s\n" `date +"%F %T %z"` $fichero $orden $salida >> $fichero   
-done
+    printf "%-20s %-20s %-20s %-10s %-10s %-10s %-10s %-10s %-10s\n" `date "+%F %T %z"` $fichero $orden $salida >> $fichero 
+
 
 if [ $1 == "-m" ] || [ $1 == "--manual" ]
     then
@@ -55,32 +55,31 @@ then
 
 elif [ $1 == "-l" ] || [ $1 == "--list" ]
 then
-    if [ $1 == "-l" ]
-    then
-        while true
-        do
-            shift
-            nuevaorden=$1
-            echo "Introduce -list o -log: "
-            if [[ $nuevaorden == "--list" ]]
-            then
-                if [ $# -gt 1 ]
-                then 
-                    shift
-                    dir_arg=$1
-                    touch "ficheros_$dir_arg_`date`.log"
-                    ls -a $dir_ar >> "ficheros_$dir_arg_`date`.log"
-                    for fichero in $dir_arg
-                    do
-                        echo El directorio $dir_arg contiene $# ficheros
-                    done
-                else
-                    touch "ficheros_HOME_`date`.log"
-                    ls -a ~ >> "ficheros_HOME_`date`.log"
-                fi
+    shift
+    while $1 == "-l" 
+    do
+        shift
+        nuevaorden=$1
+        echo "Introduce --list o --log: "
+        if [[ $nuevaorden == "--list" ]]
+        then
+            if [ $# -gt 1 ]
+            then 
+                shift
+                dir_arg=$1
+                touch "ficheros_$dir_arg_`date`.log"
+                ls -a $dir_ar >> "ficheros_$dir_arg_`date`.log"
+                for fichero in $dir_arg
+                do
+                    echo El directorio $dir_arg contiene $# ficheros
+                done
+            else
+                touch "ficheros_HOME_`date`.log"
+                ls -a ~ >> "ficheros_HOME_`date`.log"
             fi
-        done
-    fi
+        fi
+    done
+    
  
 elif [ $1 == "-k" ] || [ $1 == "--kill" ]
 then
@@ -113,19 +112,18 @@ then
 
 elif [ $1 == "-l" ] || [ $1 == "--log" ]
 then
-    if [ $1 == "-l" ]
-    then
-        while true
-        do
-            shift
-            nuevaorden=$1
-            echo "Introduce -list o -log: "
-            if [[ $1 == "--log" ]]
-            then
-                `date` >> $fichero
-            fi
-        done
-    fi
+    shift
+    while $1 == "-l" 
+    do
+        shift
+        nuevaorden=$1
+        echo "Introduce -list o -log: "
+        if [[ $1 == "--log" ]]
+        then
+            `date` >> $fichero
+        fi
+    done
+    
     
 
 else
@@ -134,5 +132,6 @@ else
 
 
 fi
+done
 
       
