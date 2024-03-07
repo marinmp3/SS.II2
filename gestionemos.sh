@@ -1,5 +1,4 @@
 #/bin/bash
-# orden=$1
 salida=true
 orden=$1
 for arg in $@
@@ -18,30 +17,24 @@ if [ $1 == "-m" ] || [ $1 == "--manual" ]
     echo "-k || --kill: Mata el proceso especificado."
     echo "-b || --backup: Crea y comprime una copia del directorio HOME."
 
-elif [ $1 == "-d" ] || [ $1 == "--dir" ]
-then
-directorio_creado="";
-    shift
-    for argumento in $@
-    do
-        if [ $argumento == "+" ]
-        then
-            $argumento=$1
-            shift
-            for $argPosterior in $@
-            do 
-                if [ -z "$directorio_creado" ]; then
-                    echo "Error: No se puede usar '+' sin haber creado un directorio previamente"
-            
-                else
-                    kdir -p "$directorio_creado/$argPosterior"
-                fi
-            done
+elif [ $1 == "-d" ] || [ $1 == "--dir" ]; then ###
+    directorio_creado=""
+    for arg in "$@"; do
+        if [ "$arg" = "-d" ] || [ "$arg" = "--dir" ]; then
+            echo "Seleccionaste la opción -d o --dir"
         else
-            mkdir -p "$argumento"
-            directorio_creado="$argumento" 
-            
-           
+            if [ "$arg" = "+" ]; then
+                if [ -z "$directorio_creado" ]; then
+                echo "Error: No se puede usar '+' sin haber creado un directorio previamente"
+                fi
+            else
+                if [ -z "$directorio_creado" ]; then
+                    mkdir -p "$arg"
+                    directorio_creado="$arg"
+                else
+                    mkdir -p "$directorio_creado/$arg" ### modificar aquí
+                fi
+            fi
         fi
     done
 
@@ -53,34 +46,23 @@ then
     top -u $user >> procesos_"$user"_"$date".log
     
 
-elif [ $1 == "-l" ] || [ $1 == "--list" ]
-then
-    shift
-    while $1 == "-l" 
-    do
+elif [ $1 == "--list" ]
+then 
+    if [ $# -gt 1 ]
+    then 
         shift
-        nuevaorden=$1
-        echo "Introduce --list o --log: "
-        if [[ $nuevaorden == "--list" ]]
-        then
-            if [ $# -gt 1 ]
-            then 
-                shift
-                dir_arg=$1
-                touch "ficheros_$dir_arg_`date`.log"
-                ls -a $dir_ar >> "ficheros_$dir_arg_`date`.log"
-                for fichero in $dir_arg
-                do
-                    echo El directorio $dir_arg contiene $# ficheros
-                done
-            else
-                touch "ficheros_HOME_`date`.log"
-                ls -a ~ >> "ficheros_HOME_`date`.log"
-            fi
-        fi
-    done
-    
- 
+        dir_arg=$1
+        touch "ficheros_$dir_arg_`date`.log"
+        ls -a $dir_ar >> "ficheros_$dir_arg_`date`.log"
+        for fichero in $dir_arg
+        do
+            echo El directorio $dir_arg contiene $# ficheros
+        done
+    else
+        touch "ficheros_HOME_`date`.log"
+        ls -a ~ >> "ficheros_HOME_`date`.log"
+    fi
+
 elif [ $1 == "-k" ] || [ $1 == "--kill" ]
 then
     shift
@@ -110,27 +92,74 @@ then
         echo "Error al crear la copia de seguridad."
     fi
 
-elif [ $1 == "-l" ] || [ $1 == "--log" ]
+elif [ $1 == "--log" ]
 then
-    shift
-    while $1 == "-l" 
-    do
-        shift
-        nuevaorden=$1
-        echo "Introduce -list o -log: "
-        if [[ $1 == "--log" ]]
-        then
-            `date` >> $fichero
-        fi
-    done
-    
-    
+    `date` >> $fichero
 
-else
+elif [ $1 == "-g" ] || [ $1 == "--group" ]
+then
+    if [ $# -eq 1 ]
+    then
+        groups
+    else
+        shift
+        nombreGrupo=$1
+        GID=$2
+
+        if [ $@ == *"-r"* ]
+        then
+            shift
+            nombreGrupo=$1
+            GID=$2
+            sudo delgroup -r $nombreGrupo
+            echo "Se ha eliminado el grupo $nombreGrupo"
+        else
+            sudo groupadd -g $GID $nombreGrupo
+            if [ -z $GID ] 
+            then
+            echo "Se ha creado el grupo $nombreGrupo (El grupo no tiene GID)"
+            else
+                echo "Se ha creado el grupo $nombreGrupo, con GID $GID"
+            fi
+        fi
+    fi
+
+elif [[ $1 == "-u" || $1 == "--user" ]]
+then
+    if [ $# -eq 1 ]
+    then
+        whoami
+    else
+        shift
+        username=$1
+        mainGroup=$2
+        secGroup=$3
+        randomPswd=$((RANDOM % 999999 + 100000))
+
+        if [[ $@ == *"-r"* ]]
+        then
+            shift
+            username=$1
+            mainGroup=$2
+            sudo deluser --remove-home $username
+            echo "Se ha eliminado el usuario $username."
+        else
+            shift
+            for ((i=0; i<$#; i++))
+            do
+                secGroup=$arg[$i]
+            done
+            sudo useradd -m -g $mainGroup -p $randomPswd -s /bin/bash $username
+            echo "
+             Se ha creado el usuario $username.
+             Grupo principal asignado: $mainGroup.
+             Contraseña: $randomPswd.
+             Grupos secundarios: ${secGroup[*]}."
+        fi
+    fi
+else 
     echo Argumento no reconocido.
     salida=false
-
-
 fi
 done
 
